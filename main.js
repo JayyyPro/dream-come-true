@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -7,42 +8,31 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+const loader = new GLTFLoader();
+
 // white plane
-const planeGeometry = new THREE.PlaneGeometry(100, 100);
+const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
 const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2;
 plane.receiveShadow = true;
 scene.add(plane);
 
-// green cube
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-cube.position.y = cube.geometry.parameters.height / 2;
-scene.add(cube);
+// item 1 : chair
+const spotLightChair = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
+spotLightChair.position.set(2.5, 5, -100);
+spotLightChair.castShadow = true;
+scene.add(spotLightChair);
 
-const spotLightCubeCube1 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
-spotLightCubeCube1.position.set(2.5, 5, 0);
-spotLightCubeCube1.castShadow = true;
-scene.add(spotLightCubeCube1);
+loader.load('chair.glb', (gltf) => {
+    const chair = gltf.scene;
+    chair.position.set(0, 0, -100);
+    chair.rotation.y = Math.PI / 2;
+    scene.add(chair);
+    spotLightChair.target = chair;
+});
 
-const spotLightCube2 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
-spotLightCube2.position.set(-2.5, 5, 0);
-spotLightCube2.castShadow = true;
-scene.add(spotLightCube2);
-
-const spotLightCube3 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
-spotLightCube3.position.set(0, 5, 2.5);
-spotLightCube3.castShadow = true;
-scene.add(spotLightCube3);
-
-const spotLightCube4 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
-spotLightCube4.position.set(0, 5, -2.5);
-spotLightCube4.castShadow = true;
-scene.add(spotLightCube4);
-
-camera.position.z = 5;
+camera.position.z = 0;
 camera.position.y = 2;
 camera.position.x = 0;
 
