@@ -18,19 +18,32 @@ plane.rotation.x = -Math.PI / 2;
 plane.receiveShadow = true;
 scene.add(plane);
 
-// item 1 : chair
-const spotLightChair = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
-spotLightChair.position.set(2.5, 5, -100);
-spotLightChair.castShadow = true;
-scene.add(spotLightChair);
+function positionObjectAndLightOnIt(nameObject, x, y, z, rotation, xLight, yLight, zLight) {
+    const spotLight = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
+    spotLight.position.set(xLight, yLight, zLight);
+    spotLight.castShadow = true;
+    scene.add(spotLight);
 
-loader.load('chair.glb', (gltf) => {
-    const chair = gltf.scene;
-    chair.position.set(0, 0, -100);
-    chair.rotation.y = Math.PI / 2;
-    scene.add(chair);
-    spotLightChair.target = chair;
-});
+    loader.load(nameObject, (gltf) => {
+        const object = gltf.scene;
+        object.position.set(x, y, z);
+        if (rotation != null) object.rotation.y = rotation;
+        scene.add(object);
+        spotLight.target = object;
+    });
+}
+
+// item 1 : chair
+positionObjectAndLightOnIt('chair.glb', 0, 0, -100, Math.PI / 2, 2.5, 5, -100);
+
+// item 2 : lamp
+positionObjectAndLightOnIt('lamp.glb', 10, 0, -175, null, 10, 5, -175);
+
+// item 3 : ketchup
+positionObjectAndLightOnIt('ketchup.glb', -10, 0, -215, null, -12.5, 5, -217.5);
+
+// item 4 : bed
+positionObjectAndLightOnIt('bed.glb', 10, 0, -300, null, 10, 5, -300);
 
 camera.position.z = 0;
 camera.position.y = 2;
