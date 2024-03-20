@@ -7,12 +7,44 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// white plane
+const planeGeometry = new THREE.PlaneGeometry(100, 100);
+const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.rotation.x = -Math.PI / 2;
+plane.receiveShadow = true;
+scene.add(plane);
+
+// green cube
 const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
+cube.position.y = cube.geometry.parameters.height / 2;
 scene.add(cube);
 
-camera.position.y = 1;
+const spotLightCubeCube1 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
+spotLightCubeCube1.position.set(2.5, 5, 0);
+spotLightCubeCube1.castShadow = true;
+scene.add(spotLightCubeCube1);
+
+const spotLightCube2 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
+spotLightCube2.position.set(-2.5, 5, 0);
+spotLightCube2.castShadow = true;
+scene.add(spotLightCube2);
+
+const spotLightCube3 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
+spotLightCube3.position.set(0, 5, 2.5);
+spotLightCube3.castShadow = true;
+scene.add(spotLightCube3);
+
+const spotLightCube4 = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
+spotLightCube4.position.set(0, 5, -2.5);
+spotLightCube4.castShadow = true;
+scene.add(spotLightCube4);
+
+camera.position.z = 5;
+camera.position.y = 2;
+camera.position.x = 0;
 
 const controls = {
     moveForward: false,
@@ -21,6 +53,7 @@ const controls = {
     moveRight: false,
     speed: 0.1,
     shiftPressed: false,
+    ctrlPressed: false,
     baseSpeed: 0.1,
     runningSpeed: 0.2,
     mousePressed: false,
@@ -31,17 +64,31 @@ const controls = {
 const keys = {};
 
 document.addEventListener('keydown', (event) => {
+    event.preventDefault();
     keys[event.code] = true;
-    if (event.code === 'ShiftLeft') {
-        controls.shiftPressed = true;
+    switch (event.code) {
+        case 'ShiftLeft':
+            controls.shiftPressed = true;
+            break;
+        case 'ControlLeft':
+            controls.ctrlPressed = true;
+            camera.position.y = 1;
+            break;
     }
     updateControls();
 });
 
 document.addEventListener('keyup', (event) => {
+    event.preventDefault();
     keys[event.code] = false;
-    if (event.code === 'ShiftLeft') {
-        controls.shiftPressed = false;
+    switch (event.code) {
+        case 'ShiftLeft':
+            controls.shiftPressed = false;
+            break;
+        case 'ControlLeft':
+            controls.ctrlPressed = false;
+            camera.position.y = 2;
+            break;
     }
     updateControls();
 });
