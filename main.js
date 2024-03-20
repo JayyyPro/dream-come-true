@@ -22,7 +22,10 @@ const controls = {
     speed: 0.1,
     shiftPressed: false,
     baseSpeed: 0.1,
-    runningSpeed: 0.2
+    runningSpeed: 0.2,
+    mousePressed: false,
+    mouseX: 0,
+    mouseY: 0
 };
 
 const keys = {};
@@ -41,6 +44,27 @@ document.addEventListener('keyup', (event) => {
         controls.shiftPressed = false;
     }
     updateControls();
+});
+
+document.addEventListener('mousedown', (event) => {
+    if (event.button === 0) {
+        controls.mousePressed = true;
+        controls.mouseX = event.clientX;
+        controls.mouseY = event.clientY;
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    controls.mousePressed = false;
+});
+
+document.addEventListener('mousemove', (event) => {
+    if (controls.mousePressed) {
+        const deltaX = event.clientX - controls.mouseX;
+        const sensitivity = 0.002;
+        camera.rotation.y -= deltaX * sensitivity;
+        controls.mouseX = event.clientX;
+    }
 });
 
 function updateControls() {
