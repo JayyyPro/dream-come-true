@@ -12,38 +12,144 @@ const loader = new GLTFLoader();
 
 // white plane
 const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
-const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2;
 plane.receiveShadow = true;
 scene.add(plane);
 
-function positionObjectAndLightOnIt(nameObject, x, y, z, rotation, xLight, yLight, zLight) {
+renderer.shadowMap.enabled = true;
+
+function positionObjectAndLightOnIt(nameObject, x, y, z, rotationX, rotationY, rotationZ, xLight, yLight, zLight) {
     const spotLight = new THREE.SpotLight(0xffffff, 2, 50, Math.PI / 4, 1, 2);
     spotLight.position.set(xLight, yLight, zLight);
+    spotLight.distance = 20;
     spotLight.castShadow = true;
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+    spotLight.shadow.camera.near = 1;
+    spotLight.shadow.camera.far = 10;
+    spotLight.shadow.focus = 1;
     scene.add(spotLight);
 
     loader.load(nameObject, (gltf) => {
-        const object = gltf.scene;
-        object.position.set(x, y, z);
-        if (rotation != null) object.rotation.y = rotation;
-        scene.add(object);
-        spotLight.target = object;
+        const material = new THREE.MeshLambertMaterial();
+        let meshObject;
+        gltf.scene.traverse((child) => {
+            if (child.isMesh) {
+                meshObject = child;
+            }
+        });
+        const mesh = new THREE.Mesh( meshObject.geometry, meshObject.material );
+        mesh.position.set(x, y, z);
+        mesh.scale.set(1.5, 1.5, 1.5);
+        if (rotationX != null) mesh.rotation.x = rotationX;
+        if (rotationY != null) mesh.rotation.y = rotationY;
+        if (rotationZ != null) mesh.rotation.z = rotationZ;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add( mesh );
+        spotLight.target = mesh;
     });
 }
 
 // item 1 : chair
-positionObjectAndLightOnIt('chair.glb', 0, 0, -100, Math.PI / 2, 2.5, 5, -100);
+positionObjectAndLightOnIt('chair.glb', 0, 0, -25, Math.PI / 2, null, -Math.PI / 2, 2.5, 5, -25);
 
 // item 2 : lamp
-positionObjectAndLightOnIt('lamp.glb', 10, 0, -175, null, 10, 5, -175);
+positionObjectAndLightOnIt('lamp.glb', 10, 0, -75, Math.PI / 2, null, null, 10, 5, -75);
 
 // item 3 : ketchup
-positionObjectAndLightOnIt('ketchup.glb', -10, 0, -215, null, -12.5, 5, -217.5);
+positionObjectAndLightOnIt('ketchup.glb', -10, 0, -115, Math.PI / 2, null, null, -12.5, 5, -117.5);
 
 // item 4 : bed
-positionObjectAndLightOnIt('bed.glb', 10, 0, -300, null, 10, 5, -300);
+positionObjectAndLightOnIt('bed.glb', 10, 0, -200, Math.PI / 2, null, null, 10, 5, -200);
+
+/* BEDROOM */
+// make a wall
+const wallVertical = new THREE.BoxGeometry(0.5, 5, 10);
+const wallHorizontal = new THREE.BoxGeometry(10, 5, 0.5);
+const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
+const wall1 = new THREE.Mesh(wallVertical, wallMaterial);
+wall1.castShadow = true;
+wall1.position.set(-5, 2.5, 0);
+scene.add(wall1);
+const wall2 = new THREE.Mesh(wallHorizontal, wallMaterial);
+wall2.castShadow = true;
+wall2.position.set(0, 2.5, 5);
+scene.add(wall2);
+const wall3 = new THREE.Mesh(wallVertical, wallMaterial);
+wall3.castShadow = true;
+wall3.position.set(5, 2.5, 0);
+wall3.castShadow = true;
+scene.add(wall3);
+const wall4 = new THREE.Mesh(wallHorizontal, wallMaterial);
+wall4.position.set(0, 2.5, -5);
+wall4.castShadow = true;
+scene.add(wall4);
+
+const spotLight1 = new THREE.SpotLight(0xffffff, 10, 100, Math.PI / 3, 1, 1);
+spotLight1.position.set(0, 5, 0);
+spotLight1.castShadow = true;
+spotLight1.shadow.mapSize.width = 1024;
+spotLight1.shadow.mapSize.height = 1024;
+spotLight1.shadow.camera.near = 1;
+spotLight1.shadow.camera.far = 10;
+spotLight1.shadow.focus = 1;
+const spotLight2 = new THREE.SpotLight(0xffffff, 10, 100, Math.PI / 3, 1, 1);
+spotLight2.position.set(0, 5, 5);
+spotLight2.castShadow = true;
+spotLight2.shadow.mapSize.width = 1024;
+spotLight2.shadow.mapSize.height = 1024;
+spotLight2.shadow.camera.near = 1;
+spotLight2.shadow.camera.far = 10;
+spotLight2.shadow.focus = 1;
+const spotLight3 = new THREE.SpotLight(0xffffff, 10, 100, Math.PI / 3, 1, 1);
+spotLight3.position.set(0, 5, -5);
+spotLight3.castShadow = true;
+spotLight3.shadow.mapSize.width = 1024;
+spotLight3.shadow.mapSize.height = 1024;
+spotLight3.shadow.camera.near = 1;
+spotLight3.shadow.camera.far = 10;
+spotLight3.shadow.focus = 1;
+const spotLight4 = new THREE.SpotLight(0xffffff, 10, 100, Math.PI / 3, 1, 1);
+spotLight4.position.set(5, 5, 0);
+spotLight4.castShadow = true;
+spotLight4.shadow.mapSize.width = 1024;
+spotLight4.shadow.mapSize.height = 1024;
+spotLight4.shadow.camera.near = 1;
+spotLight4.shadow.camera.far = 10;
+spotLight4.shadow.focus = 1;
+const spotLight5 = new THREE.SpotLight(0xffffff, 10, 100, Math.PI / 3, 1, 1);
+spotLight5.position.set(-5, 5, 0);
+spotLight5.castShadow = true;
+spotLight5.shadow.mapSize.width = 1024;
+spotLight5.shadow.mapSize.height = 1024;
+spotLight5.shadow.camera.near = 1;
+spotLight5.shadow.camera.far = 10;
+spotLight5.shadow.focus = 1;
+const targetLights = new THREE.Object3D();
+targetLights.position.set(0, 2.5, 0);
+spotLight1.target = targetLights;
+spotLight2.target = targetLights;
+spotLight3.target = targetLights;
+spotLight4.target = targetLights;
+spotLight5.target = targetLights;
+
+// make a group with the walls and the lights
+const bedroom = new THREE.Group();
+bedroom.add(wall1);
+bedroom.add(wall2);
+bedroom.add(wall3);
+bedroom.add(wall4);
+bedroom.add(spotLight1);
+bedroom.add(spotLight2);
+bedroom.add(spotLight3);
+bedroom.add(spotLight4);
+bedroom.add(spotLight5);
+bedroom.add(targetLights);
+bedroom.position.set(20, 0, -300);
+scene.add(bedroom);
 
 camera.position.z = 0;
 camera.position.y = 2;
